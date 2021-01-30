@@ -1,0 +1,15 @@
+version: '3'
+services:
+  app:
+    image: node:14.15.4-alpine3.12
+    environment:
+      - http_proxy
+      - https_proxy
+    ports:
+      - 4200:4200
+    volumes:
+      - .:/workspace
+      - node_modules:/workspace/node_modules
+    working_dir: /workspace
+volumes:
+  node_modules:
