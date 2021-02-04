@@ -1,3 +1,6 @@
+import { RealProfileImageService } from 'src/app/services/real-profile-image.service';
+
 export const environment = {
-  production: true
+  production: true,
+  ProfileImageService: RealProfileImageService,
 };

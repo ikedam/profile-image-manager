@@ -2,8 +2,11 @@
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
+import { MockProfileImageService } from 'src/app/services/mock-profile-image.service';
+
 export const environment = {
-  production: false
+  production: false,
+  ProfileImageService: MockProfileImageService,
 };
 
 /*
