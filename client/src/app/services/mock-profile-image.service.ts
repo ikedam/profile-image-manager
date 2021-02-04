@@ -46,12 +46,13 @@ export class MockProfileImageService extends ProfileImageService {
         this.data.splice(idx, 1);
       }
     }
-    return of().pipe(
+    // of(void) だとエラーが起きる。
+    return of('dummy').pipe(
       delay(this.DELAY),
       tap(() => {
+        console.log('hogehoge');
         this.change.next();
       }),
-      // これがないと void と unknown のマッピングに失敗する
       map((_) => { return; }),
     );
   }
