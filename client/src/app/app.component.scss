@@ -1,0 +1,37 @@
+.closable {
+  .closable-header {
+    cursor: pointer;
+    &:before {
+      font-family: 'Font Awesome 5 Free';
+      content: "\f0fe";
+      margin-right: 0.25rem;
+    }
+  }
+  .closable-content {
+    display: none;
+  }
+  &.open {
+    .closable-header {
+      &:before {
+        content: "\f146";
+      }
+    }
+    .closable-content {
+      display: block;
+    }
+  }
+}
+
+section {
+  margin-bottom: 1rem;
+}
+
+h1 {
+  font-size: 1.44rem;
+  margin-bottom: 0.5rem;
+}
+
+h2 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}

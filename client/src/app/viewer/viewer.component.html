@@ -1,1 +1,29 @@
-<p>viewer works!</p>
+<div class="viewer" [class.verifying]="verifying" *ngIf="profileImage != null">
+  <div class="image">
+    <img src="{{profileImage.image}}">
+  </div>
+  <table class="attributes">
+    <tbody>
+      <th>日付</th>
+      <td>{{profileImage.createdAt | date: 'yyyy/MM/dd HH:mm:ss'}}</td>
+    </tbody>
+  </table>
+  <div class="operations">
+    <button class="delete" (click)="doDelete();">削除</button>
+  </div>
+  <div class="verify" (click)="cancelDelete();">
+    <div class="modal">
+      <div class="verify-image">
+        <img src="{{profileImage.image}}">
+      </div>
+      <div class="verify-message">
+        削除しますか？
+      </div>
+      <button class="delete" (click)="doDeleteEnsure(); $event.stopPropagation();" *ngIf="!deleting">本当に削除</button>
+      <button class="delete" *ngIf="deleting">削除中...</button>
+    </div>
+  </div>
+</div>
+<div class="viewr" *ngIf="profileImage == null">
+  (画像未選択)
+</div>

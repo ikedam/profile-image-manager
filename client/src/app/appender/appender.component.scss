@@ -1,0 +1,82 @@
+button {
+  border: 0.05rem solid #000;
+  border-radius: 0.2rem;
+  background-color: #fff;
+  padding: 0.5rem;
+  margin: 0.2rem;
+  &:active {
+    background-color:#68c;
+    color: #fff;
+  }
+}
+
+.icon {
+  font-size: 0;
+  &.active {
+    background-color:#68c;
+    color: #fff;
+  }
+  &:before {
+    font-family: 'Font Awesome 5 Free';
+    font-size: 1.2rem;
+  }
+  &.reload {
+    &:before {
+      content: "\f2f1";
+    }
+  }
+  &.largest {
+    &:before {
+      content: "\f31e";
+    }
+  }
+  &.smallest {
+    &:before {
+      content: "\f78c";
+    }
+  }
+  &.square {
+    &:before {
+      content: "\f0c8";
+    }
+  }
+  &.circle {
+    &:before {
+      content: "\f111";
+    }
+  }
+}
+
+.image-adjust {
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.icon-groups {
+  display: flex;
+  flex-direction: row;
+  margin-left: -1rem;
+}
+
+.icon-group {
+  margin-left: 1rem;
+}
+
+.resizer {
+  background-color: #999;
+  height: 0.2em;
+  width: 100%;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+canvas {
+  background-color: #999;
+  width: 100%;
+}
+
+.operations {
+  display: flex;
+  flex-direction: row;
+}

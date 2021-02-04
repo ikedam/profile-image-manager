@@ -1,1 +1,25 @@
-<p>appender works!</p>
+<div class="top">
+  <div class="image-adjust">
+    <div class="icon-groups">
+      <div class="icon-group controllers">
+        <button class="icon reload">Reload</button>
+        <button class="icon largest">Largest</button>
+        <button class="icon smallest">Smallest</button>
+      </div>
+      <div class="icon-group masks">
+        <button class="icon square" [class.active]="isSquareMask" (click)="isSquareMask = true;">Square</button>
+        <button class="icon circle" [class.active]="!isSquareMask" (click)="isSquareMask = false;">Circle</button>
+      </div>
+    </div>
+    <div class="resize">
+      <input class="resizer" type="range" min="0" max="1000">
+    </div>
+    <div class="image">
+      <canvas width="600" height="600"></canvas>
+    </div>
+  </div>
+  <div class="operations">
+    <button>ファイルを指定</button>
+    <button>この画像で登録</button>
+  </div>
+</div>

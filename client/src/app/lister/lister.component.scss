@@ -1,0 +1,83 @@
+button {
+  padding: 0.5rem;
+  margin: 0.2rem;
+  &.reload {
+    border: 0.05rem solid #000;
+    border-radius: 0.2rem;
+    background-color: #fff;
+    &:active {
+      background-color:#68c;
+      color: #fff;
+    }
+  }
+}
+
+.icon {
+  font-size: 0;
+  &:before {
+    font-family: 'Font Awesome 5 Free';
+    font-size: 1.2rem;
+  }
+  &.reload {
+    &:before {
+      content: "\f2f1";
+    }
+  }
+  &.larger {
+    &:before {
+      content: "\f0fe";
+    }
+  }
+  &.smaller {
+    &:before {
+      content: "\f146";
+    }
+  }
+}
+
+.imagelist {
+  position: relative;
+  .profile-image-list {
+    display: flex;
+    article {
+      /*box-shadow: 0 0 0.1em transparent;*/
+      margin: 0.5em;
+    }
+    article.active {
+      box-shadow: 0 0 0.5em #666;
+    }
+  }
+  .loader {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.5);
+    color: #000;
+    justify-content: center;
+    align-items: center;
+    z-index: 2147483647;
+
+    .spinner {
+      display: inline-block;
+      font-size: 0;
+      &:before {
+        font-size: 2rem;
+        font-family: 'Font Awesome 5 Free';
+        content: "\f110";
+      }
+      animation: rotation 1.5s linear infinite;
+      @keyframes rotation {
+        0%   { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    }
+  }
+  &.loading {
+    .loader {
+      display: flex;
+    }
+  }
+}

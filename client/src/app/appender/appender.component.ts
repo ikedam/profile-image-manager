@@ -6,6 +6,7 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./appender.component.scss']
 })
 export class AppenderComponent implements OnInit {
+  public isSquareMask = true;
 
   constructor() { }
 

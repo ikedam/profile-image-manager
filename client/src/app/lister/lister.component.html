@@ -1,1 +1,16 @@
-<p>lister works!</p>
+<button class="icon reload" (click)="loadImages();">Reload</button>
+<button class="icon smaller" (click)="smaller();">Smaller</button>
+<button class="icon larger" (click)="larger();">Larger</button>
+<div class="imagelist" [class.loading]="loading">
+  <div class="profile-image-list">
+    <article class="profile-image"
+        [class.active]="isActive(profileImage)"
+        (click)="selectImage(profileImage)"
+        *ngFor="let profileImage of profileImageList">
+      <img src="{{profileImage.image}}" style.width="{{size}}px" style.height="{{size}}px">
+    </article>
+  </div>
+  <div class="loader">
+    <div class="spinner">Loading...</div>
+  </div>
+</div>
