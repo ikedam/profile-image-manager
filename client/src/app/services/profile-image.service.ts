@@ -15,8 +15,10 @@ export abstract class ProfileImageService {
 
   public abstract loadImages(): Observable<ProfileImage[]>;
   public abstract delete(image: ProfileImage): Observable<void>;
+  public abstract upload(data: string): Observable<ProfileImage>;
 
   public onChange(): Observable<void> {
     return this.change.asObservable();
   }
+
 }

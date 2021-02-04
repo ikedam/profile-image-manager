@@ -23,4 +23,14 @@ export class RealProfileImageService extends ProfileImageService {
     // TODO
     return of();
   }
+
+  public upload(data: string): Observable<ProfileImage> {
+    // TODO
+    const profileImage: ProfileImage = {
+      id: (new Date()).getTime().toString(),
+      image: data,
+      createdAt: new Date(),
+    };
+    return of(profileImage);
+  }
 }

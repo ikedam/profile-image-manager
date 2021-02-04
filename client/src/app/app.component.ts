@@ -8,7 +8,7 @@ import { ProfileImage } from './model/profile_image';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  public isAppenderOpen = false;
+  public isAppenderOpen = true;
   public isViewerOpen = false;
   public profileImage: ProfileImage | null  = null;
 

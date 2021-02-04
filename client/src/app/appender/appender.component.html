@@ -15,11 +15,28 @@
       <input class="resizer" type="range" min="0" max="1000">
     </div>
     <div class="image">
-      <canvas width="600" height="600"></canvas>
+      <canvas #canvas width="600" height="600"></canvas>
     </div>
   </div>
   <div class="operations">
-    <button>ファイルを指定</button>
-    <button>この画像で登録</button>
+    <button (click)="selectFile();">ファイルを指定</button>
+    <button (click)="doUpload();">この画像で登録</button>
   </div>
 </div>
+<div class="verify" [class.verifying]="verifying" (click)="cancelUpload();">
+  <div class="modal">
+    <div class="verify-image">
+      <img src="{{previewImage}}">
+    </div>
+    <div class="verify-message">
+      この画像で登録しますか？
+    </div>
+    <button class="upload" (click)="doUploadEnsure(); $event.stopPropagation();" *ngIf="!uploading">登録</button>
+    <button class="upload" *ngIf="uploading">登録中...</button>
+  </div>
+</div>
+<div class="hidden">
+  <input type="file" #file accept="image/*" (change)="onNewFileSelecteted()">
+  <canvas #previewCanvas width="400" height="400"></canvas>
+</div>
+

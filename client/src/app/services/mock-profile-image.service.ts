@@ -55,4 +55,19 @@ export class MockProfileImageService extends ProfileImageService {
       map((_) => { return; }),
     );
   }
+
+  public upload(data: string): Observable<ProfileImage> {
+    const profileImage: ProfileImage = {
+      id: (new Date()).getTime().toString(),
+      image: data,
+      createdAt: new Date(),
+    };
+    this.data.push(profileImage);
+    return of(profileImage).pipe(
+      delay(this.DELAY),
+      tap(() => {
+        this.change.next();
+      }),
+    );
+  }
 }
