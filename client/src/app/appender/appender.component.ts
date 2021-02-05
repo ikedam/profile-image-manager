@@ -356,15 +356,33 @@ export class AppenderComponent implements OnInit {
     ctx.beginPath();
     if (this.isSquareMask) {
       ctx.rect(
+        0,
+        0,
+        this.CANVAS_SIZE,
+        (this.CANVAS_SIZE - this.CROP_SIZE) / 2,
+      );
+      ctx.rect(
+        0,
+        (this.CANVAS_SIZE + this.CROP_SIZE) / 2,
+        this.CANVAS_SIZE,
+        (this.CANVAS_SIZE - this.CROP_SIZE) / 2,
+      );
+      ctx.rect(
+        0,
+        (this.CANVAS_SIZE - this.CROP_SIZE) / 2,
+        (this.CANVAS_SIZE - this.CROP_SIZE) / 2,
+        this.CROP_SIZE,
+      );
+      ctx.rect(
         (this.CANVAS_SIZE + this.CROP_SIZE) / 2,
         (this.CANVAS_SIZE - this.CROP_SIZE) / 2,
-        -this.CROP_SIZE,
+        (this.CANVAS_SIZE - this.CROP_SIZE) / 2,
         this.CROP_SIZE,
       );
     } else {
+      ctx.rect(0, 0, this.CANVAS_SIZE, this.CANVAS_SIZE);
       ctx.arc(this.CANVAS_SIZE / 2, this.CANVAS_SIZE / 2, this.CROP_SIZE / 2, 0, 2 * Math.PI, true);
     }
-    ctx.rect(0, 0, this.CANVAS_SIZE, this.CANVAS_SIZE);
     ctx.fill();
   }
 

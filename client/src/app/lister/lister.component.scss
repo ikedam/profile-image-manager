@@ -39,6 +39,7 @@ button {
   position: relative;
   .profile-image-list {
     display: flex;
+    flex-wrap: wrap;
     article {
       /*box-shadow: 0 0 0.1em transparent;*/
       margin: 0.5em;
