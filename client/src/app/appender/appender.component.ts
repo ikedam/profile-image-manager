@@ -21,6 +21,10 @@ interface CalcuratedRange {
   y: number;
   width: number;
   height: number;
+  destX: number;
+  destY: number;
+  destWidth: number;
+  destHeight: number;
   cropX: number;
   cropY: number;
   cropWidth: number;
@@ -313,17 +317,46 @@ export class AppenderComponent implements OnInit {
     } else if (this.image.height < cropBottom) {
       y -= cropBottom - this.image.height;
     }
+    const fixX = x - baseX;
+    const fixY = y - baseY;
+    const cropX = Math.floor(x + (this.CANVAS_SIZE - this.CROP_SIZE) / 2 / scale);
+    const cropY = Math.floor(y + (this.CANVAS_SIZE - this.CROP_SIZE) / 2 / scale);
+
+    // 画像の枠外にあるとき、補正を行う。
+    let destX = 0;
+    let destY = 0;
+    let destWidth = this.CANVAS_SIZE;
+    let destHeight = this.CANVAS_SIZE;
+
+    if (x < 0) {
+      destX -= x * scale;
+      destWidth -= destX;
+      x = 0;
+    } else if (x > this.image.width) {
+      destWidth -= (x - this.image.width) * scale;
+    }
+    if (y < 0) {
+      destY -= y * scale;
+      destHeight -= destY;
+      y = 0;
+    } else if (y > this.image.height) {
+      destHeight -= (y - this.image.height) * scale;
+    }
     return {
       x,
       y,
-      width: Math.floor(this.CANVAS_SIZE / scale),
-      height: Math.floor(this.CANVAS_SIZE / scale),
-      cropX: Math.floor(x + (this.CANVAS_SIZE - this.CROP_SIZE) / 2 / scale),
-      cropY: Math.floor(y + (this.CANVAS_SIZE - this.CROP_SIZE) / 2 / scale),
+      width: Math.floor(destWidth / scale),
+      height: Math.floor(destHeight / scale),
+      destX,
+      destY,
+      destWidth,
+      destHeight,
+      cropX,
+      cropY,
       cropWidth: Math.floor(this.CROP_SIZE / scale),
       cropHeight: Math.floor(this.CROP_SIZE / scale),
-      fixX: x - baseX,
-      fixY: y - baseY,
+      fixX,
+      fixY,
     };
   }
 
@@ -343,10 +376,10 @@ export class AppenderComponent implements OnInit {
       range.y,
       range.width,
       range.height,
-      0,
-      0,
-      this.CANVAS_SIZE,
-      this.CANVAS_SIZE,
+      range.destX,
+      range.destY,
+      range.destWidth,
+      range.destHeight,
     );
     if (this.isBlackMask) {
       ctx.fillStyle = 'rgb(0, 0, 0)';
