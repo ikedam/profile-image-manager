@@ -123,3 +123,23 @@ canvas {
     color: #fff;
   }
 }
+
+.dragging {
+  display: none;
+  position: fixed;
+  z-index: 2147483647;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 3rem;
+  font-weight: bold;
+  justify-content: center;
+  align-items: center;
+
+  &.active {
+    display: flex;
+  }
+}

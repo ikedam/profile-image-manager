@@ -1,4 +1,4 @@
-<div class="top">
+<div class="top" (dragover)="onDragOver($event);" (dragleave)="onDragLeave($event);" (drop)="onDrop($event);">
   <div class="image-adjust">
     <div class="icon-groups">
       <div class="icon-group controllers">
@@ -20,18 +20,24 @@
     <div class="image">
       <canvas #canvas width="{{CANVAS_SIZE}}" height="{{CANVAS_SIZE}}"
         (mousedown)="onCanvasMouseDown($event);"
-        (touchstart)="onCanvasTouchStart($event);$event.stopPropagation();$event.preventDefault();"
+        (touchstart)="onCanvasTouchStart($event);"
         (mousemove)="onCanvasMouseMove($event);"
-        (touchmove)="onCanvasTouchMove($event);$event.stopPropagation();$event.preventDefault();"
+        (touchmove)="onCanvasTouchMove($event);"
         (mouseup)="onCanvasMouseUp($event);"
-        (touchend)="onCanvasTouchEnd($event);$event.stopPropagation();$event.preventDefault();"
+        (touchend)="onCanvasTouchEnd($event);"
         (mouseout)="onCanvasMouseUp($event);"
+        (click)="onCanvasClicked();"
       ></canvas>
     </div>
   </div>
   <div class="operations">
     <button (click)="selectFile();">ファイルを指定</button>
     <button (click)="doUpload();">この画像で登録</button>
+  </div>
+  <div class="dragging" [class.active]="fileDragging">
+    <div>
+      ドロップで画像を読み込み
+    </div>
   </div>
 </div>
 <div class="verify" [class.verifying]="verifying" (click)="cancelUpload();">

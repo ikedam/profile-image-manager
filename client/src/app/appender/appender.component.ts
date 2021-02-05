@@ -43,6 +43,7 @@ export class AppenderComponent implements OnInit {
   public isBlackMask = false;
   public verifying = false;
   public uploading = false;
+  public fileDragging = false;
   public previewImage: string | null = null;
   public resizerMin = 0.1 * this.SCALE_RESOLUTION;
   public resizerMax = 5 * this.SCALE_RESOLUTION;
@@ -87,6 +88,29 @@ export class AppenderComponent implements OnInit {
     this.fileElement.nativeElement.click();
   }
 
+  onDragOver(event: DragEvent): void {
+    this.fileDragging = true;
+    event.stopPropagation();
+    event.preventDefault();
+  }
+
+  onDragLeave(event: DragEvent): void {
+    this.fileDragging = false;
+    event.stopPropagation();
+    event.preventDefault();
+  }
+
+  onDrop(event: DragEvent): void {
+    this.fileDragging = false;
+    event.stopPropagation();
+    event.preventDefault();
+    if (event.dataTransfer == null) {
+      return;
+    }
+    this.fileElement.nativeElement.files = event.dataTransfer.files;
+    this.onNewFileSelecteted();
+  }
+
   onNewFileSelecteted(): void {
     const files = this.fileElement.nativeElement.files;
     if (files == null) {
@@ -108,12 +132,26 @@ export class AppenderComponent implements OnInit {
     reader.readAsDataURL(file);
   }
 
+  private isFileSelected(): boolean {
+    return this.image.src !== '';
+  }
+
   onCanvasMouseDown(event: MouseEvent): void {
+    if (!this.isFileSelected()) {
+      return;
+    }
     this.onCanvasDragStart(event.pageX, event.pageY);
+    event.stopPropagation();
+    event.preventDefault();
   }
 
   onCanvasTouchStart(event: TouchEvent): void {
+    if (!this.isFileSelected()) {
+      return;
+    }
     this.onCanvasDragStart(event.changedTouches[0].pageX, event.changedTouches[0].pageY);
+    event.stopPropagation();
+    event.preventDefault();
   }
 
   private onCanvasDragStart(x: number, y: number): void {
@@ -130,11 +168,21 @@ export class AppenderComponent implements OnInit {
   }
 
   onCanvasMouseMove(event: MouseEvent): void {
+    if (!this.isFileSelected()) {
+      return;
+    }
     this.onCanvasDrag(event.pageX, event.pageY);
+    event.stopPropagation();
+    event.preventDefault();
   }
 
   onCanvasTouchMove(event: TouchEvent): void {
+    if (!this.isFileSelected()) {
+      return;
+    }
     this.onCanvasDrag(event.changedTouches[0].pageX, event.changedTouches[0].pageY);
+    event.stopPropagation();
+    event.preventDefault();
   }
 
   private onCanvasDrag(x: number, y: number): void {
@@ -147,11 +195,21 @@ export class AppenderComponent implements OnInit {
   }
 
   onCanvasMouseUp(event: MouseEvent): void {
+    if (!this.isFileSelected()) {
+      return;
+    }
     this.onCanvasDragEnd(event.pageX, event.pageY);
+    event.stopPropagation();
+    event.preventDefault();
   }
 
   onCanvasTouchEnd(event: TouchEvent): void {
+    if (!this.isFileSelected()) {
+      return;
+    }
     this.onCanvasDragEnd(event.changedTouches[0].pageX, event.changedTouches[0].pageY);
+    event.stopPropagation();
+    event.preventDefault();
   }
 
   private onCanvasDragEnd(x: number, y: number): void {
@@ -179,6 +237,13 @@ export class AppenderComponent implements OnInit {
     this.canvasState.x += range.fixX;
     this.canvasState.y += range.fixY;
     this.drawCanvas();
+  }
+
+  onCanvasClicked(): void {
+    if (this.image.src !== '') {
+      return;
+    }
+    this.selectFile();
   }
 
   initCanvas(): void {
