@@ -2,20 +2,30 @@
   <div class="image-adjust">
     <div class="icon-groups">
       <div class="icon-group controllers">
-        <button class="icon reload">Reload</button>
-        <button class="icon largest">Largest</button>
-        <button class="icon smallest">Smallest</button>
+        <button class="icon reload" (click)="initCanvas();">Reload</button>
+        <button class="icon smallest" (click)="fitToSmallest();">Smallest</button>
       </div>
       <div class="icon-group masks">
-        <button class="icon square" [class.active]="isSquareMask" (click)="isSquareMask = true;">Square</button>
-        <button class="icon circle" [class.active]="!isSquareMask" (click)="isSquareMask = false;">Circle</button>
+        <button class="icon square" [class.active]="isSquareMask" (click)="setSquareMask(true);">Square</button>
+        <button class="icon circle" [class.active]="!isSquareMask" (click)="setSquareMask(false);">Circle</button>
+        <button class="icon eye" [class.active]="isBlackMask" (click)="toggleBlackMask();">BlackMask</button>
       </div>
     </div>
     <div class="resize">
-      <input class="resizer" type="range" min="0" max="1000">
+      <input class="resizer" type="range" min="{{resizerMin}}" max="{{resizerMax}}" [(ngModel)]="canvasState.scale"
+        (input)="onCanvasResizing();"
+        (change)="onCanvasResized();"
+      >
     </div>
     <div class="image">
-      <canvas #canvas width="600" height="600"></canvas>
+      <canvas #canvas width="{{CANVAS_SIZE}}" height="{{CANVAS_SIZE}}"
+        (mousedown)="onCanvasMouseDown($event);"
+        (touchstart)="onCanvasTouchStart($event);"
+        (mousemove)="onCanvasMouseMove($event);"
+        (touchmove)="onCanvasTouchMove($event);"
+        (mouseup)="onCanvasMouseUp($event);"
+        (touchend)="onCanvasTouchEnd($event);"
+      ></canvas>
     </div>
   </div>
   <div class="operations">

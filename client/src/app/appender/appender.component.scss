@@ -45,6 +45,16 @@ button {
       content: "\f111";
     }
   }
+  &.eye {
+    &:before {
+      content: "\f06e";
+    }
+    &.active {
+      &:before {
+        content: "\f070";
+      }
+    }
+  }
 }
 
 .image-adjust {
