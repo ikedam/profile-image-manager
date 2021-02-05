@@ -113,7 +113,7 @@ export class AppenderComponent implements OnInit {
   }
 
   onCanvasTouchStart(event: TouchEvent): void {
-    this.onCanvasDragStart(event.touches[0].pageX, event.touches[0].pageY);
+    this.onCanvasDragStart(event.changedTouches[0].pageX, event.changedTouches[0].pageY);
   }
 
   private onCanvasDragStart(x: number, y: number): void {
@@ -134,7 +134,7 @@ export class AppenderComponent implements OnInit {
   }
 
   onCanvasTouchMove(event: TouchEvent): void {
-    this.onCanvasDrag(event.touches[0].pageX, event.touches[0].pageY);
+    this.onCanvasDrag(event.changedTouches[0].pageX, event.changedTouches[0].pageY);
   }
 
   private onCanvasDrag(x: number, y: number): void {
@@ -151,7 +151,7 @@ export class AppenderComponent implements OnInit {
   }
 
   onCanvasTouchEnd(event: TouchEvent): void {
-    this.onCanvasDragEnd(event.touches[0].pageX, event.touches[0].pageY);
+    this.onCanvasDragEnd(event.changedTouches[0].pageX, event.changedTouches[0].pageY);
   }
 
   private onCanvasDragEnd(x: number, y: number): void {
@@ -200,21 +200,9 @@ export class AppenderComponent implements OnInit {
       scale = yScale;
     }
     // キャンバスの左上に画像をおいた場合の画像上の座標
-    let x = this.CANVAS_SIZE / 2 / scale;
-    let y = this.CANVAS_SIZE / 2 / scale;
-    /*
-    // 画像の右下のポイントは、キャンバスの表示領域の右下よりも左上にないといけない
-    const cropBottomRight = ((this.CANVAS_SIZE - this.CROP_SIZE) / 2 + this.CROP_SIZE) / scale;
-    if (x + this.image.width / 2 < cropBottomRight) {
-      x = cropBottomRight - this.image.width / 2;
-    }
-    if (y + this.image.height / 2 < cropBottomRight) {
-      y = cropBottomRight - this.image.height / 2;
-    }
-    */
     this.canvasState = {
-      x,
-      y,
+      x: Math.floor(this.CANVAS_SIZE / 2 / scale),
+      y: Math.floor(this.CANVAS_SIZE / 2 / scale),
       scale: Math.floor(scale * this.SCALE_RESOLUTION),
     };
     const range = this.calculateSourceRange(false);

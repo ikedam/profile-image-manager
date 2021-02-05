@@ -20,11 +20,12 @@
     <div class="image">
       <canvas #canvas width="{{CANVAS_SIZE}}" height="{{CANVAS_SIZE}}"
         (mousedown)="onCanvasMouseDown($event);"
-        (touchstart)="onCanvasTouchStart($event);"
+        (touchstart)="onCanvasTouchStart($event);$event.stopPropagation();$event.preventDefault();"
         (mousemove)="onCanvasMouseMove($event);"
-        (touchmove)="onCanvasTouchMove($event);"
+        (touchmove)="onCanvasTouchMove($event);$event.stopPropagation();$event.preventDefault();"
         (mouseup)="onCanvasMouseUp($event);"
-        (touchend)="onCanvasTouchEnd($event);"
+        (touchend)="onCanvasTouchEnd($event);$event.stopPropagation();$event.preventDefault();"
+        (mouseout)="onCanvasMouseUp($event);"
       ></canvas>
     </div>
   </div>
