@@ -1,0 +1,33 @@
+version: '3'
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+      args:
+        - http_proxy
+        - https_proxy
+    environment:
+      - http_proxy
+      - https_proxy
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    command:
+      - /bin/sh
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: server
+      args:
+        - http_proxy
+        - https_proxy
+    environment:
+      - http_proxy
+      - https_proxy
+    volumes:
+      - ./images:/usr/local/apache2/htdocs/images
+    ports:
+      - 8080:80
