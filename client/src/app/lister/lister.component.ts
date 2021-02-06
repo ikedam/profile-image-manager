@@ -1,9 +1,15 @@
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
+import { publish, tap } from 'rxjs/operators';
 
 import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 
 import { ProfileImage } from '../model/profile_image';
 import { ProfileImageService } from '../services/profile-image.service';
+
+export interface ImageSelectedEvent {
+  profileImage: ProfileImage | null;
+  forEvent: boolean;
+}
 
 @Component({
   selector: 'app-lister',
@@ -17,7 +23,7 @@ export class ListerComponent implements OnDestroy, OnInit {
   public activeImage: (ProfileImage|null) = null;
   public scale = 0;
   public size = 96;
-  @Output() imageSelected = new EventEmitter<ProfileImage|null>();
+  @Output() imageSelected = new EventEmitter<ImageSelectedEvent>();
 
   private profileImageSubscription = new Subscription();
 
@@ -27,8 +33,8 @@ export class ListerComponent implements OnDestroy, OnInit {
     this.loadImages();
     this.profileImageSubscription.add(
       this.profileImage.onChange().subscribe(
-        () => {
-          this.loadImages();
+        (e) => {
+          this.loadImages(e.id);
         }
       )
     );
@@ -38,7 +44,7 @@ export class ListerComponent implements OnDestroy, OnInit {
     this.profileImageSubscription.unsubscribe();
   }
 
-  public loadImages(): void {
+  public loadImages(targetImageId?: string): void {
     if (this.loading) {
       return;
     }
@@ -47,7 +53,11 @@ export class ListerComponent implements OnDestroy, OnInit {
       images => {
         this.profileImageList = images;
         this.loading = false;
-        this.setActiveImage(this.activeImage);
+        if (targetImageId != null) {
+          this.setActiveImageById(targetImageId, true);
+        } else {
+          this.setActiveImage(this.activeImage);
+        }
       }
     );
   }
@@ -84,18 +94,29 @@ export class ListerComponent implements OnDestroy, OnInit {
     this.setActiveImage(image);
   }
 
-  public setActiveImage(image: ProfileImage | null): void {
-    if (image != null) {
+  public setActiveImage(image: ProfileImage | null): boolean {
+    return this.setActiveImageById((image != null) ? image.id : null);
+  }
+
+  public setActiveImageById(id: string | null, forEvent?: boolean): boolean {
+    if (id != null) {
       for (const im of this.profileImageList) {
-        if (image.id === im.id) {
+        if (id === im.id) {
           this.activeImage = im;
-          this.imageSelected.emit(this.activeImage);
-          return;
+          this.imageSelected.emit({
+            profileImage: this.activeImage,
+            forEvent: forEvent ? true : false,
+          });
+          return true;
         }
       }
     }
     this.activeImage = null;
-    this.imageSelected.emit(this.activeImage);
+    this.imageSelected.emit({
+      profileImage: this.activeImage,
+      forEvent: forEvent ? true : false,
+    });
+    return false;
   }
 
   public isActive(image: ProfileImage): boolean {

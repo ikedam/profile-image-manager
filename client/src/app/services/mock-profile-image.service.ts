@@ -50,16 +50,19 @@ export class MockProfileImageService extends ProfileImageService {
     return of('dummy').pipe(
       delay(this.DELAY),
       tap(() => {
-        console.log('hogehoge');
-        this.change.next();
+        this.change.next({
+          eventType: 'delete',
+          id: image.id,
+        });
       }),
       map((_) => { return; }),
     );
   }
 
   public upload(data: string): Observable<ProfileImage> {
+    const id = (new Date()).getTime().toString();
     const profileImage: ProfileImage = {
-      id: (new Date()).getTime().toString(),
+      id,
       image: data,
       createdAt: new Date(),
     };
@@ -67,7 +70,10 @@ export class MockProfileImageService extends ProfileImageService {
     return of(profileImage).pipe(
       delay(this.DELAY),
       tap(() => {
-        this.change.next();
+        this.change.next({
+          eventType: 'upload',
+          id,
+        });
       }),
     );
   }

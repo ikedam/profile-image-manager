@@ -6,7 +6,7 @@
       <app-appender></app-appender>
     </div>
   </section>
-  <section id="viewer" class="closable" [class.open]="isViewerOpen">
+  <section #viewer id="viewer" class="closable" [class.open]="isViewerOpen">
     <h2 class="closable-header" (click)="isViewerOpen = !isViewerOpen;">詳細</h2>
     <div class="closable-content">
       <app-viewer [profileImage]="profileImage"></app-viewer>
