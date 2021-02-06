@@ -1,0 +1,48 @@
+version: '3'
+services:
+  client:
+    image: node:14.15.4-alpine3.12
+    environment:
+      - http_proxy
+      - https_proxy
+      - API_SERVER=http://server/
+    networks:
+      - default
+    ports:
+      - 4200:4200
+    volumes:
+      - ./client:/workspace
+      - node_modules:/workspace/node_modules
+    working_dir: /workspace
+    command:
+      - sh
+      - -c
+      - |
+        if [ -z "$$(ls node_modules 2>/dev/null)" ]; then
+          echo "Installing modules..."
+          npm install
+        fi
+        exec npm start -- \
+          --prod \
+          --poll 1000 \
+          --proxy-config proxy.conf.js
+          
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+      target: server
+      args:
+        - http_proxy
+        - https_proxy
+    environment:
+      - http_proxy
+      - https_proxy
+    networks:
+      - default
+    volumes:
+      - ./server/images:/usr/local/apache2/htdocs/images
+volumes:
+  node_modules:
+networks:
+  default:
