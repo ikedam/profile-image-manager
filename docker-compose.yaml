@@ -6,10 +6,11 @@ services:
       - http_proxy
       - https_proxy
       - API_SERVER=http://server/
+      - APP_SUFFIX=/profile-image-manager
     networks:
       - default
     ports:
-      - 4200:4200
+      - 8080:4200
     volumes:
       - ./client:/workspace
       - node_modules:/workspace/node_modules
@@ -25,6 +26,7 @@ services:
         exec npm start -- \
           --prod \
           --poll 1000 \
+          --serve-path "$${APP_SUFFIX}" \
           --proxy-config proxy.conf.js
           
   server:

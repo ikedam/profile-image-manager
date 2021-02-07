@@ -30,4 +30,4 @@ services:
     volumes:
       - ./images:/usr/local/apache2/htdocs/images
     ports:
-      - 8080:80
+      - 8000:80

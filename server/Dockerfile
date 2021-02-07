@@ -11,7 +11,7 @@ RUN CGO_ENABLED=0 go build -o api.cgi -ldflags "-X main.version=${VERSION:-dev} 
 
 FROM httpd:2.4.46-alpine as server
 
-COPY --from=build /workspace/api.cgi /usr/local/apache2/htdocs/api.cgi
+COPY --from=build /workspace/api.cgi /usr/local/apache2/htdocs/profile-image-manager/api.cgi
 RUN sh -c 'echo "<Directory \"/usr/local/apache2/htdocs\">" >>/usr/local/apache2/conf/httpd.conf' \
   && sh -c 'echo "Options +ExecCGI" >>/usr/local/apache2/conf/httpd.conf' \
   && sh -c 'echo "</Directory>" >>/usr/local/apache2/conf/httpd.conf' \

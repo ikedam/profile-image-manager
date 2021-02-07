@@ -15,8 +15,8 @@ var (
 
 func main() {
 	config := &server.Config{
-		ImageDir:      "./images",
-		ImageBasePath: "../images",
+		ImageDir:      "../images",
+		ImageBasePath: "../../images",
 	}
 	s := server.NewServerForCGI(config)
 	if err := cgi.Serve(s); err != nil {
