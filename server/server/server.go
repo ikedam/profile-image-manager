@@ -17,7 +17,6 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/ikedam/imageman/log"
-	"github.com/rs/xid"
 )
 
 type Config struct {
@@ -53,9 +52,9 @@ func newServer(config *Config, prefix string) *Server {
 		prefix:  prefix,
 	}
 	router := r.PathPrefix(prefix).Subrouter()
-	router.HandleFunc("", s.list)
-	router.HandleFunc("/", s.list)
-	router.HandleFunc("/upload/png", s.uploadPng)
+	router.HandleFunc("", s.list).Methods("GET")
+	router.HandleFunc("/", s.list).Methods("GET")
+	router.HandleFunc("/upload/png", s.uploadPng).Methods("POST")
 	return s
 }
 
@@ -144,7 +143,7 @@ func (s *Server) countImages() (int, error) {
 
 func (s *Server) prepareNewFile(ext string) string {
 	for i := 0; i < 10; i++ {
-		filename := xid.New().String() + ext
+		filename := fmt.Sprintf("%v%v", time.Now().UnixNano(), ext)
 		path := filepath.Join(s.config.ImageDir, filename)
 		if _, err := os.Stat(path); err == nil {
 			//already exists
@@ -161,6 +160,12 @@ func (s *Server) prepareNewFile(ext string) string {
 }
 
 func (s *Server) uploadPng(w http.ResponseWriter, r *http.Request) {
+	if r.Body == nil {
+		log.WithField("path", r.RequestURI).
+			Error("Body is nil")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	defer r.Body.Close()
 	body, err := ioutil.ReadAll(base64.NewDecoder(base64.StdEncoding, r.Body))
 	if err != nil {
