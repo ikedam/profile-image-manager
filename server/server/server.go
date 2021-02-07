@@ -199,17 +199,14 @@ func (s *Server) uploadPng(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cnt, err := s.countImages()
-	if err != nil {
+	if cnt, err := s.countImages(); err != nil {
 		log.WithError(err).
 			WithField("method", r.Method).
 			WithField("path", r.RequestURI).
 			Error("Failed to count images")
 		w.WriteHeader(http.StatusRequestEntityTooLarge)
 		return
-	}
-
-	if s.config.MaxImages > 0 && cnt > s.config.MaxImages {
+	} else if s.config.MaxImages > 0 && cnt > s.config.MaxImages {
 		log.WithField("method", r.Method).
 			WithField("path", r.RequestURI).
 			WithField("count", cnt).
@@ -256,6 +253,24 @@ func (s *Server) uploadPng(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.writeJSONResponse(w, response)
+}
+
+func (s *Server) countDeletedImages() (int, error) {
+	files, err := ioutil.ReadDir(s.config.DeleteDir)
+	if err != nil {
+		return 0, fmt.Errorf("Failed to list directory: %w", err)
+	}
+	cnt := 0
+	for _, file := range files {
+		if file.IsDir() {
+			continue
+		}
+		if !isImageExt(file.Name()) {
+			continue
+		}
+		cnt = cnt + 1
+	}
+	return cnt, nil
 }
 
 func (s *Server) delete(w http.ResponseWriter, r *http.Request) {
@@ -332,6 +347,23 @@ func (s *Server) delete(w http.ResponseWriter, r *http.Request) {
 			WithField("dir", s.config.DeleteDir).
 			Warning("Failed to stat deleted dir")
 		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if cnt, err := s.countDeletedImages(); err != nil {
+		log.WithError(err).
+			WithField("method", r.Method).
+			WithField("path", r.RequestURI).
+			WithField("dir", s.config.DeleteDir).
+			Warning("Failed to count deleted dir")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	} else if s.config.MaxDeletedImages > 0 && cnt > s.config.MaxDeletedImages {
+		log.WithField("method", r.Method).
+			WithField("path", r.RequestURI).
+			WithField("count", cnt).
+			Error("too many deleted images")
+		w.WriteHeader(http.StatusTooManyRequests)
 		return
 	}
 
