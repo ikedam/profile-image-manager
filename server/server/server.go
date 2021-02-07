@@ -21,6 +21,7 @@ import (
 
 type Config struct {
 	ImageDir         string
+	DeleteDir        string
 	ImageBasePath    string
 	MaxDataSize      int
 	MaxImages        int
@@ -55,6 +56,7 @@ func newServer(config *Config, prefix string) *Server {
 	router.HandleFunc("", s.list).Methods("GET")
 	router.HandleFunc("/", s.list).Methods("GET")
 	router.HandleFunc("/upload/png", s.uploadPng).Methods("POST")
+	router.HandleFunc("/{id}", s.delete).Methods("DELETE")
 	return s
 }
 
@@ -94,6 +96,7 @@ func (s *Server) list(w http.ResponseWriter, r *http.Request) {
 	files, err := ioutil.ReadDir(s.config.ImageDir)
 	if err != nil {
 		log.WithError(err).
+			WithField("method", r.Method).
 			WithField("path", r.RequestURI).
 			WithField("dir", s.config.ImageDir).
 			Error("Failed to list directory")
@@ -161,8 +164,9 @@ func (s *Server) prepareNewFile(ext string) string {
 
 func (s *Server) uploadPng(w http.ResponseWriter, r *http.Request) {
 	if r.Body == nil {
-		log.WithField("path", r.RequestURI).
-			Error("Body is nil")
+		log.WithField("method", r.Method).
+			WithField("path", r.RequestURI).
+			Warning("Body is nil")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -170,24 +174,27 @@ func (s *Server) uploadPng(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(base64.NewDecoder(base64.StdEncoding, r.Body))
 	if err != nil {
 		log.WithError(err).
+			WithField("method", r.Method).
 			WithField("path", r.RequestURI).
-			Error("Failed to read body")
+			Warning("Failed to read body")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	if s.config.MaxDataSize > 0 && len(body) > s.config.MaxDataSize {
-		log.WithField("path", r.RequestURI).
+		log.WithField("method", r.Method).
+			WithField("path", r.RequestURI).
 			WithField("size", len(body)).
-			Error("too large data")
+			Warning("too large data")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	if _, err := png.Decode(bytes.NewReader(body)); err != nil {
 		log.WithError(err).
+			WithField("method", r.Method).
 			WithField("path", r.RequestURI).
-			Error("Failed to read body")
+			Warning("Failed to parse as a png")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -195,6 +202,7 @@ func (s *Server) uploadPng(w http.ResponseWriter, r *http.Request) {
 	cnt, err := s.countImages()
 	if err != nil {
 		log.WithError(err).
+			WithField("method", r.Method).
 			WithField("path", r.RequestURI).
 			Error("Failed to count images")
 		w.WriteHeader(http.StatusRequestEntityTooLarge)
@@ -202,7 +210,8 @@ func (s *Server) uploadPng(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if s.config.MaxImages > 0 && cnt > s.config.MaxImages {
-		log.WithField("path", r.RequestURI).
+		log.WithField("method", r.Method).
+			WithField("path", r.RequestURI).
 			WithField("count", cnt).
 			Error("too many images")
 		w.WriteHeader(http.StatusTooManyRequests)
@@ -211,7 +220,8 @@ func (s *Server) uploadPng(w http.ResponseWriter, r *http.Request) {
 
 	filename := s.prepareNewFile(".png")
 	if filename == "" {
-		log.WithField("path", r.RequestURI).
+		log.WithField("method", r.Method).
+			WithField("path", r.RequestURI).
 			Error("Failed to issue a new filename")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -220,6 +230,7 @@ func (s *Server) uploadPng(w http.ResponseWriter, r *http.Request) {
 	path := filepath.Join(s.config.ImageDir, filename)
 	if err := ioutil.WriteFile(path, body, 0644); err != nil {
 		log.WithError(err).
+			WithField("method", r.Method).
 			WithField("path", r.RequestURI).
 			WithField("filename", filename).
 			Error("Failed to create a new image")
@@ -230,6 +241,7 @@ func (s *Server) uploadPng(w http.ResponseWriter, r *http.Request) {
 	stat, err := os.Stat(path)
 	if err != nil {
 		log.WithError(err).
+			WithField("method", r.Method).
 			WithField("path", r.RequestURI).
 			WithField("filename", filename).
 			Error("Failed to stat the file")
@@ -244,6 +256,97 @@ func (s *Server) uploadPng(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.writeJSONResponse(w, response)
+}
+
+func (s *Server) delete(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, ok := vars["id"]
+	if !ok {
+		log.WithField("method", r.Method).
+			WithField("path", r.RequestURI).
+			Warning("No id specified")
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	if dir, _ := filepath.Split(id); dir != "" {
+		log.WithField("method", r.Method).
+			WithField("path", r.RequestURI).
+			WithField("id", id).
+			Warning("Bad id specified")
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	path := filepath.Join(s.config.ImageDir, id)
+	if _, err := os.Stat(path); err != nil {
+		if os.IsNotExist(err) {
+			log.WithField("method", r.Method).
+				WithField("path", r.RequestURI).
+				WithField("id", id).
+				Warning("Not found")
+			w.WriteHeader(http.StatusNotFound)
+			return
+		} else {
+			log.WithError(err).
+				WithField("method", r.Method).
+				WithField("path", r.RequestURI).
+				WithField("id", id).
+				Warning("Failed to stat file")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+	}
+	deletePath := filepath.Join(s.config.DeleteDir, id)
+	if _, err := os.Stat(deletePath); err == nil {
+		// file exists
+		log.WithField("method", r.Method).
+			WithField("path", r.RequestURI).
+			WithField("id", id).
+			Warning("already exists")
+		w.WriteHeader(http.StatusConflict)
+		return
+	} else if !os.IsNotExist(err) {
+		log.WithError(err).
+			WithField("method", r.Method).
+			WithField("path", r.RequestURI).
+			WithField("id", id).
+			Warning("Failed to stat deleted file")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if _, err := os.Stat(s.config.DeleteDir); err != nil && os.IsNotExist(err) {
+		if err := os.Mkdir(s.config.DeleteDir, 0755); err != nil {
+			log.WithError(err).
+				WithField("method", r.Method).
+				WithField("path", r.RequestURI).
+				WithField("dir", s.config.DeleteDir).
+				Warning("Failed to create deleted dir")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+	} else if err != nil {
+		log.WithError(err).
+			WithField("method", r.Method).
+			WithField("path", r.RequestURI).
+			WithField("dir", s.config.DeleteDir).
+			Warning("Failed to stat deleted dir")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if err := os.Rename(path, deletePath); err != nil {
+		log.WithError(err).
+			WithField("method", r.Method).
+			WithField("path", r.RequestURI).
+			WithField("from", path).
+			WithField("to", deletePath).
+			Warning("Failed to rename file")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
 
 func (s *Server) writeJSONResponse(w http.ResponseWriter, obj interface{}) {

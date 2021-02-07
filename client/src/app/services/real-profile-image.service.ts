@@ -20,7 +20,7 @@ export class RealProfileImageService extends ProfileImageService {
 
   public loadImages(): Observable<ProfileImage[]> {
     return this.http.get<RawProfileImage[]>(
-      this.SERVER_ROOT + '/',
+      `${this.SERVER_ROOT}/`,
     ).pipe(
       map((rawProfileImageList: RawProfileImage[]) => {
         return rawProfileImageList.map(
@@ -31,9 +31,16 @@ export class RealProfileImageService extends ProfileImageService {
   }
 
   public delete(image: ProfileImage): Observable<void> {
-    // TODO
-    return of('dummy').pipe(
+    return this.http.delete(
+      `${this.SERVER_ROOT}/${image.id}`,
+    ).pipe(
       map((_) => { return; }),
+      tap((_) => {
+        this.change.next({
+          eventType: 'delete',
+          id: image.id,
+        });
+      }),
     );
   }
 
@@ -44,7 +51,7 @@ export class RealProfileImageService extends ProfileImageService {
     }
     data = data.substr(expectedPrefix.length);
     return this.http.post<RawProfileImage>(
-      this.SERVER_ROOT + '/upload/png',
+      `${this.SERVER_ROOT}/upload/png`,
       data,
     ).pipe(
       map((rawProfileImage: RawProfileImage) => {

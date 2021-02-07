@@ -16,6 +16,7 @@ var (
 func main() {
 	config := &server.Config{
 		ImageDir:         "../images",
+		DeleteDir:        "../images/delete",
 		ImageBasePath:    "../../images",
 		MaxDataSize:      10 * 1024 * 1024,
 		MaxImages:        50,
