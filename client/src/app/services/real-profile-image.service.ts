@@ -1,5 +1,5 @@
-import { Observable, of } from 'rxjs';
-import { map, mergeMap } from 'rxjs/operators';
+import { Observable, of, throwError } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
@@ -38,13 +38,27 @@ export class RealProfileImageService extends ProfileImageService {
   }
 
   public upload(data: string): Observable<ProfileImage> {
-    // TODO
-    const profileImage: ProfileImage = {
-      id: (new Date()).getTime().toString(),
-      image: data,
-      createdAt: new Date(),
-    };
-    return of(profileImage);
+    const expectedPrefix = 'data:image/png;base64,';
+    if (!data.startsWith(expectedPrefix)) {
+      return throwError('Unexpected data format');
+    }
+    data = data.substr(expectedPrefix.length);
+    return this.http.post<RawProfileImage>(
+      this.SERVER_ROOT + '/upload/png',
+      data,
+    ).pipe(
+      map((rawProfileImage: RawProfileImage) => {
+        return this.convertRawProfileImageToProfileImage(
+          rawProfileImage,
+        );
+      }),
+      tap((profileImage: ProfileImage) => {
+        this.change.next({
+          eventType: 'upload',
+          id: profileImage.id,
+        });
+      }),
+    );
   }
 
   private convertRawProfileImageToProfileImage(rawProfileImage: RawProfileImage): ProfileImage {

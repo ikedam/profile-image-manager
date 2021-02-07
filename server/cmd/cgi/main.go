@@ -15,8 +15,11 @@ var (
 
 func main() {
 	config := &server.Config{
-		ImageDir:      "../images",
-		ImageBasePath: "../../images",
+		ImageDir:         "../images",
+		ImageBasePath:    "../../images",
+		MaxDataSize:      10 * 1024 * 1024,
+		MaxImages:        50,
+		MaxDeletedImages: 100,
 	}
 	s := server.NewServerForCGI(config)
 	if err := cgi.Serve(s); err != nil {
