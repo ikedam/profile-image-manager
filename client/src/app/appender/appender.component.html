@@ -27,6 +27,9 @@
         (touchend)="onCanvasTouchEnd($event);"
         (mouseout)="onCanvasMouseUp($event);"
         (click)="onCanvasClicked();"
+        (gesturestart)="onCanvasGestureStart($event);"
+        (gesturechange)="onCanvasGestureChange($event);"
+        (gestureend)="onCanvasGestureEnd($event);"
       ></canvas>
     </div>
   </div>

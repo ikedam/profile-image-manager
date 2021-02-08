@@ -2,12 +2,23 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 
 import { ProfileImageService } from '../services/profile-image.service';
 
+// GestureEvent is non-standard
+interface MyGestureEvent {
+  rotation: number;
+  scale: number;
+}
+
 interface DragState {
   dragging: boolean;
   startX: number;
   startY: number;
   moveX: number;
   moveY: number;
+}
+
+interface GestureState {
+  gesturing: boolean;
+  scale: number;
 }
 
 interface CanvasState {
@@ -58,6 +69,10 @@ export class AppenderComponent implements OnInit {
     startY: 0,
     moveX: 0,
     moveY: 0,
+  };
+  private gestureState: GestureState = {
+    gesturing: false,
+    scale: 1.0,
   };
   public canvasState: CanvasState = {
     x: this.CANVAS_SIZE / 2,
@@ -162,6 +177,9 @@ export class AppenderComponent implements OnInit {
     if (this.dragState.dragging) {
       return;
     }
+    if (this.gestureState.gesturing) {
+      return;
+    }
     this.dragState = {
       dragging: true,
       startX: x,
@@ -232,6 +250,43 @@ export class AppenderComponent implements OnInit {
     this.drawCanvas();
   }
 
+  onCanvasGestureStart(e: any): void {
+    const event = e as MyGestureEvent;
+    if (this.dragState.dragging) {
+      this.dragState.dragging = false;
+    }
+    this.gestureState.gesturing = true;
+    this.gestureState.scale = event.scale;
+
+    this.drawCanvas();
+  }
+
+  onCanvasGestureChange(e: any): void {
+    const event = e as MyGestureEvent;
+    if (!this.gestureState.gesturing) {
+      return;
+    }
+    this.gestureState.scale = event.scale;
+    this.drawCanvas();
+  }
+
+  onCanvasGestureEnd(e: any): void {
+    const event = e as MyGestureEvent;
+    if (!this.gestureState.gesturing) {
+      return;
+    }
+    this.gestureState.gesturing = false;
+    this.canvasState.scale = Math.floor(this.canvasState.scale * event.scale);
+    if (this.canvasState.scale < this.resizerMin) {
+      this.canvasState.scale = this.resizerMin;
+    }
+    if (this.canvasState.scale > this.resizerMax) {
+      this.canvasState.scale = this.resizerMax;
+    }
+
+    this.drawCanvas();
+  }
+
   onCanvasResizing(): void {
     this.drawCanvas();
   }
@@ -291,7 +346,17 @@ export class AppenderComponent implements OnInit {
   }
 
   private calculateSourceRange(includeDrag: boolean): CalcuratedRange {
-    const scale = this.canvasState.scale / this.SCALE_RESOLUTION;
+    let rawScale = this.canvasState.scale;
+    if (includeDrag && this.gestureState.gesturing) {
+      rawScale *= this.gestureState.scale;
+      if (rawScale < this.resizerMin) {
+        rawScale = this.resizerMin;
+      }
+      if (rawScale > this.resizerMax) {
+        rawScale = this.resizerMax;
+      }
+    }
+    const scale = rawScale / this.SCALE_RESOLUTION;
     let baseX = this.canvasState.x - (this.CANVAS_SIZE / 2 / scale);
     let baseY = this.canvasState.y - (this.CANVAS_SIZE / 2 / scale);
     if (includeDrag && this.dragState.dragging) {
