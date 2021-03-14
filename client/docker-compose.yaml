@@ -11,5 +11,11 @@ services:
       - .:/workspace
       - node_modules:/workspace/node_modules
     working_dir: /workspace
+    command:
+      - npm
+      - start
+      - --
+      - --poll
+      - '500'
 volumes:
   node_modules:
