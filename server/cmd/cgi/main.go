@@ -19,8 +19,8 @@ func main() {
 		DeleteDir:        "../images/delete",
 		ImageBasePath:    "../../images",
 		MaxDataSize:      10 * 1024 * 1024,
-		MaxImages:        50,
-		MaxDeletedImages: 100,
+		MaxImages:        100,
+		MaxDeletedImages: 500,
 	}
 	s := server.NewServerForCGI(config)
 	if err := cgi.Serve(s); err != nil {
