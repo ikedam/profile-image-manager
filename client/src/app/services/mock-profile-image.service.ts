@@ -1,4 +1,4 @@
-import { Observable, of, Subject } from 'rxjs';
+import { Observable, of, Subject, throwError } from 'rxjs';
 import { delay, map, tap } from 'rxjs/operators';
 
 import { Injectable } from '@angular/core';
@@ -60,6 +60,7 @@ export class MockProfileImageService extends ProfileImageService {
   }
 
   public upload(data: string): Observable<ProfileImage> {
+    // return throwError("test");
     const id = (new Date()).getTime().toString();
     const profileImage: ProfileImage = {
       id,

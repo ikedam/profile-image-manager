@@ -22,6 +22,75 @@
   }
 }
 
+#error {
+  .error-info {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  
+    background-color: #fcc;
+    border-radius: 0.5em;
+    margin: 0.5em;
+    padding: 0.5em;
+
+    .error-texts {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .error-buttons {
+      display: flex;
+      flex-direction: row;
+    }
+
+    &.expand {
+      .detail {
+        display: block;
+      }
+      .icon.collapse {
+        display: inline-block;
+      }
+      .icon.expand {
+        display: none;
+      }
+    }
+    .detail {
+      display: none;
+    }
+    .icon.collapse {
+      display: none;
+    }
+    .icon.expand {
+      display: inline-block;
+    }
+}
+
+  .icon {
+    font-size: 0;
+    display: inline-block;
+    padding: 0.5rem;
+    &:before {
+      font-family: 'Font Awesome 5 Free';
+      font-size: 1.2rem;
+    }
+    &.dismiss {
+      &:before {
+        content: "\f00d";
+      }
+    }
+    &.expand {
+      &:before {
+        content: "\f103";
+      }
+    }
+    &.collapse {
+      &:before {
+        content: "\f102";
+      }
+    }
+  }
+}
+
 section {
   margin-bottom: 1rem;
 }

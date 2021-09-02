@@ -1,5 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 
+import { ErrorService } from '../services/error.service';
 import { ProfileImageService } from '../services/profile-image.service';
 
 // GestureEvent is non-standard
@@ -85,7 +86,7 @@ export class AppenderComponent implements OnInit {
   @ViewChild('previewCanvas') private previewCanvas!: ElementRef<HTMLCanvasElement>;
   private image = new Image();
 
-  constructor(private profileImageService: ProfileImageService) { }
+  constructor(private profileImageService: ProfileImageService, private error: ErrorService) { }
 
   ngOnInit(): void {
   }
@@ -532,7 +533,12 @@ export class AppenderComponent implements OnInit {
       () => {
         this.uploading = false;
         this.verifying = false;
-      }
+      },
+      (error) => {
+        this.error.addError(error);
+        this.uploading = false;
+        this.verifying = false;
+      },
     );
   }
 

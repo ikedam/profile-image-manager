@@ -1,5 +1,18 @@
 <main>
   <h1>アイコン画像管理</h1>
+  <section #errorBlock id="error">
+    <div class="error-info" [class.expand]="e.expand" *ngFor="let e of error.errors">
+      <div class="error-texts">
+        <div class="message">{{e.message}}</div>
+        <div class="detail">{{stringify(e.data)}}</div>
+      </div>
+      <div class="error-buttons">
+        <button class="icon collapse" (click)="e.expand = false">Collapse</button>
+        <button class="icon expand" (click)="e.expand = true">Expand</button>
+        <button class="icon dismiss" (click)="error.dismiss(e.id)">Dismiss</button>
+      </div>
+    </div>
+  </section>
   <section id="appender" class="closable" [class.open]="isAppenderOpen">
     <h2 class="closable-header" (click)="isAppenderOpen = !isAppenderOpen;">画像追加</h2>
     <div class="closable-content">
